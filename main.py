@@ -26,95 +26,87 @@ def find_closest(value):
 
 
 def color_dither():
-    img = Image.open('lena.bmp')
-    img_data = img.getdata()
+    new_img = Image.open('sonic.png')
 
-    new_img = Image.new('RGB', img.size, 'black')
-    new_pixel = new_img.load()
+    new_img = new_img.convert('RGB')
+    pixel = new_img.load()
 
-    x_lim, y_lim = img.size
-
-    pixel = img_data.getpixel
+    x_lim, y_lim = new_img.size
 
     for y in range(1, y_lim):
         for x in range(1, x_lim):
-            red_oldpixel, green_oldpixel, blue_oldpixel = pixel((x, y))
+            red_oldpixel, green_oldpixel, blue_oldpixel = pixel[x, y]
 
-            red_newpixel = find_closest(red_oldpixel)
-            green_newpixel = find_closest(green_oldpixel)
-            blue_newpixel = find_closest(blue_oldpixel)
+            red_newpixel = 255 * floor(red_oldpixel/128)
+            green_newpixel = 255 * floor(green_oldpixel/128)
+            blue_newpixel = 255 * floor(blue_oldpixel/128)
+
+            pixel[x, y] = red_newpixel, green_newpixel, blue_newpixel
 
             red_error = red_oldpixel - red_newpixel
             blue_error = blue_oldpixel - blue_newpixel
             green_error = green_oldpixel - green_newpixel
 
             if x < x_lim - 1:
-                red = pixel((x+1, y))[0] + floor(red_error * 7/16)
-                green = pixel((x+1, y))[1] + floor(green_error * 7/16)
-                blue = pixel((x+1, y))[2] + floor(blue_error * 7/16)
+                red = pixel[x+1, y][0] + round(red_error * 7/16)
+                green = pixel[x+1, y][1] + round(green_error * 7/16)
+                blue = pixel[x+1, y][2] + round(blue_error * 7/16)
 
-                new_pixel[x, y-1] = (red, green, blue)
+                pixel[x+1, y] = (red, green, blue)
 
             if x > 1 and y < y_lim - 1:
-                red = pixel((x-1, y+1))[0] + floor(red_error * 3/16)
-                green = pixel((x-1, y+1))[1] + floor(green_error * 3/16)
-                blue = pixel((x-1, y+1))[2] + floor(blue_error * 3/16)
+                red = pixel[x-1, y+1][0] + round(red_error * 3/16)
+                green = pixel[x-1, y+1][1] + round(green_error * 3/16)
+                blue = pixel[x-1, y+1][2] + round(blue_error * 3/16)
 
-                new_pixel[x-2, y] = (red, green, blue)
+                pixel[x-1, y+1] = (red, green, blue)
 
             if y < y_lim - 1:
-                red = pixel((x, y+1))[0] + floor(red_error * 5/16)
-                green = pixel((x, y+1))[1] + floor(green_error * 5/16)
-                blue = pixel((x, y+1))[2] + floor(blue_error * 5/16)
+                red = pixel[x, y+1][0] + round(red_error * 5/16)
+                green = pixel[x, y+1][1] + round(green_error * 5/16)
+                blue = pixel[x, y+1][2] + round(blue_error * 5/16)
 
-                new_pixel[x-1, y] = (red, green, blue)
+                pixel[x, y+1] = (red, green, blue)
 
             if x < x_lim - 1 and y < y_lim - 1:
-                red = pixel((x+1, y+1))[0] + floor(red_error * 1/16)
-                green = pixel((x+1, y+1))[1] + floor(green_error * 1/16)
-                blue = pixel((x+1, y+1))[2] + floor(blue_error * 1/16)
+                red = pixel[x+1, y+1][0] + round(red_error * 1/16)
+                green = pixel[x+1, y+1][1] + round(green_error * 1/16)
+                blue = pixel[x+1, y+1][2] + round(blue_error * 1/16)
 
-                new_pixel[x, y] = (red, green, blue)
+                pixel[x+1, y+1] = (red, green, blue)
 
     new_img.show()
 
 
 def bw_dither():
     img = Image.open('lena_bw.png')
-    img_data = img.getdata()
 
-    new_img = Image.new('L', img.size)
-    new_pixel = new_img.load()
+    new_img = img.convert('L')
+    pixel = new_img.load()
 
     x_lim, y_lim = img.size
 
-    pixel = img_data.getpixel
-
-    for y in range(1, y_lim):
-        for x in range(1, x_lim):
-            oldpixel = pixel((x, y))[0]
-
-            newpixel = find_closest(oldpixel)
+    for y in range(0, y_lim):
+        for x in range(0, x_lim):
+            oldpixel = pixel[x, y]
+            newpixel = 255 * floor(oldpixel/128)
+            pixel[x, y] = newpixel
             error = oldpixel - newpixel
 
             if x < x_lim - 1:
-                bw = pixel((x+1, y))[0] + floor(error * 7/16)
-                new_pixel[x, y-1] = bw
+                pixel[x+1, y] += round(error * 7/16)
 
             if x > 1 and y < y_lim - 1:
-                bw = pixel((x-1, y+1))[0] + floor(error * 3/16)
-                new_pixel[x-2, y] = bw
+                pixel[x-1, y+1] += round(error * 3/16)
 
             if y < y_lim - 1:
-                bw = pixel((x, y+1))[0] + floor(error * 5/16)
-                new_pixel[x-1, y] = bw
+                pixel[x, y+1] += round(error * 5/16)
 
             if x < x_lim - 1 and y < y_lim - 1:
-                bw = pixel((x+1, y+1))[0] + floor(error * 1/16)
-                new_pixel[x, y] = bw
+                pixel[x+1, y+1] += round(error * 1/16)
 
     new_img.show()
 
 
 if __name__ == "__main__":
-    bw_dither()
+    color_dither()
