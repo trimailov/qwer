@@ -47,28 +47,28 @@ for y in range(1, y_lim):
         blue_error = blue_oldpixel - blue_newpixel
         green_error = green_oldpixel - green_newpixel
 
-        if x < 511:
+        if x < x_lim - 1:
             red = pixel((x+1, y))[0] + floor(red_error * 7/16)
             green = pixel((x+1, y))[1] + floor(green_error * 7/16)
             blue = pixel((x+1, y))[2] + floor(blue_error * 7/16)
 
             new_pixel[x, y-1] = (red, green, blue)
 
-        if x > 1 and y < 511:
+        if x > 1 and y < y_lim - 1:
             red = pixel((x-1, y+1))[0] + floor(red_error * 3/16)
             green = pixel((x-1, y+1))[1] + floor(green_error * 3/16)
             blue = pixel((x-1, y+1))[2] + floor(blue_error * 3/16)
 
             new_pixel[x-2, y] = (red, green, blue)
 
-        if y < 511:
+        if y < y_lim - 1:
             red = pixel((x, y+1))[0] + floor(red_error * 5/16)
             green = pixel((x, y+1))[1] + floor(green_error * 5/16)
             blue = pixel((x, y+1))[2] + floor(blue_error * 5/16)
 
             new_pixel[x-1, y] = (red, green, blue)
 
-        if x < 511 and y < 511:
+        if x < x_lim - 1 and y < y_lim - 1:
             red = pixel((x+1, y+1))[0] + floor(red_error * 1/16)
             green = pixel((x+1, y+1))[1] + floor(green_error * 1/16)
             blue = pixel((x+1, y+1))[2] + floor(blue_error * 1/16)
