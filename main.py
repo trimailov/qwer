@@ -77,3 +77,44 @@ def color_dither():
                 new_pixel[x, y] = (red, green, blue)
 
     new_img.show()
+
+
+def bw_dither():
+    img = Image.open('lena_bw.png')
+    img_data = img.getdata()
+
+    new_img = Image.new('L', img.size)
+    new_pixel = new_img.load()
+
+    x_lim, y_lim = img.size
+
+    pixel = img_data.getpixel
+
+    for y in range(1, y_lim):
+        for x in range(1, x_lim):
+            oldpixel = pixel((x, y))[0]
+
+            newpixel = find_closest(oldpixel)
+            error = oldpixel - newpixel
+
+            if x < x_lim - 1:
+                bw = pixel((x+1, y))[0] + floor(error * 7/16)
+                new_pixel[x, y-1] = bw
+
+            if x > 1 and y < y_lim - 1:
+                bw = pixel((x-1, y+1))[0] + floor(error * 3/16)
+                new_pixel[x-2, y] = bw
+
+            if y < y_lim - 1:
+                bw = pixel((x, y+1))[0] + floor(error * 5/16)
+                new_pixel[x-1, y] = bw
+
+            if x < x_lim - 1 and y < y_lim - 1:
+                bw = pixel((x+1, y+1))[0] + floor(error * 1/16)
+                new_pixel[x, y] = bw
+
+    new_img.show()
+
+
+if __name__ == "__main__":
+    bw_dither()
