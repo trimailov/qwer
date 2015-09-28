@@ -21,8 +21,9 @@ from math import floor
 from PIL import Image
 
 
-def find_closest(value):
-    return 64 * floor(value/64)
+def apply_threshold(value):
+    "Returns 0 or 255 depending where value is closer"
+    return 255 * floor(value/128)
 
 
 def color_dither():
@@ -37,9 +38,9 @@ def color_dither():
         for x in range(1, x_lim):
             red_oldpixel, green_oldpixel, blue_oldpixel = pixel[x, y]
 
-            red_newpixel = 255 * floor(red_oldpixel/128)
-            green_newpixel = 255 * floor(green_oldpixel/128)
-            blue_newpixel = 255 * floor(blue_oldpixel/128)
+            red_newpixel = apply_threshold(red_oldpixel)
+            green_newpixel = apply_threshold(green_oldpixel)
+            blue_newpixel = apply_threshold(blue_oldpixel)
 
             pixel[x, y] = red_newpixel, green_newpixel, blue_newpixel
 
@@ -89,7 +90,7 @@ def bw_dither():
     for y in range(0, y_lim):
         for x in range(0, x_lim):
             oldpixel = pixel[x, y]
-            newpixel = 255 * floor(oldpixel/128)
+            newpixel = apply_threshold(oldpixel)
             pixel[x, y] = newpixel
             error = oldpixel - newpixel
 
