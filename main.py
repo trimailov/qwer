@@ -17,8 +17,11 @@
 #
 # find_closest_palette_color(oldpixel) = floor(oldpixel / 256)
 
+from argparse import ArgumentParser
 from math import floor
 from PIL import Image
+
+import sys
 
 
 def apply_threshold(value):
@@ -26,8 +29,8 @@ def apply_threshold(value):
     return 255 * floor(value/128)
 
 
-def color_dither():
-    new_img = Image.open('sonic.png')
+def color_dither(image_file):
+    new_img = Image.open(image_file)
 
     new_img = new_img.convert('RGB')
     pixel = new_img.load()
@@ -79,8 +82,8 @@ def color_dither():
     new_img.show()
 
 
-def bw_dither():
-    img = Image.open('lena_bw.png')
+def bw_dither(image_file):
+    img = Image.open(image_file)
 
     new_img = img.convert('L')
     pixel = new_img.load()
@@ -109,5 +112,13 @@ def bw_dither():
     new_img.show()
 
 
-if __name__ == "__main__":
-    color_dither()
+def main():
+    parser = ArgumentParser(description="Image dithering in python")
+    parser.add_argument("image", help="input image location")
+    parser.add_argument("-o", help="output image location")
+    args = parser.parse_args()
+
+    if args.image:
+        color_dither(args.image)
+    elif: args.image and args.o:
+        color_dither(args.image, save=True)
