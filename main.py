@@ -25,10 +25,12 @@ import os
 
 
 class Dither():
-    def __init__(self, path, algorithm, save):
-        self.path = get_path(path)
-        self.func = get_func(algorithm)
-        self.func(self.path, save=save)
+    def __init__(self, path, algorithm=None, output=None):
+        self.path = self.get_path(path)
+        self.algorithm = algorithm
+        self.output = output
+        self.func = self.get_func(self.algorithm)
+        self.func(self.path)
 
     def get_path(self, path):
         """Get whole path of an image
@@ -43,13 +45,13 @@ class Dither():
 
     def get_func(self, algorithm):
         "Get dithering function to run"
-        return floyd_steingberg
+        return self.floyd_steinberg_dither
 
     def apply_threshold(self, value):
         "Returns 0 or 255 depending where value is closer"
         return 255 * floor(value/128)
 
-    def floyd_steinberg_dither(self, image_file, save=False):
+    def floyd_steinberg_dither(self, image_file):
         new_img = Image.open(image_file)
 
         new_img = new_img.convert('RGB')
@@ -109,6 +111,6 @@ def main():
     args = parser.parse_args()
 
     if args.image_path:
-        Dither(args.image_path, algorithm='', save=False)
+        Dither(args.image_path)
     elif args.image_path and args.o:
-        Dither(args.image, algorithm='', save=True)
+        Dither(args.image)
