@@ -103,7 +103,10 @@ class Dither():
 
                     pixel[x+1, y+1] = (red, green, blue)
 
-        new_img.show()
+        if self.output:
+            new_img.save(self.output)
+        else:
+            new_img.show()
 
 
 def main():
@@ -112,7 +115,7 @@ def main():
     parser.add_argument("-o", help="output image location")
     args = parser.parse_args()
 
-    if args.image_path:
+    if args.image_path and not args.o:
         Dither(args.image_path)
     elif args.image_path and args.o:
-        Dither(args.image)
+        Dither(args.image_path, output=args.o)
