@@ -8,7 +8,8 @@ import os
 
 
 class Dither():
-    def __init__(self, path, algorithm=None, output=None):
+    def __init__(self, path, algorithm=None, output=None, bw=False):
+        self.bw = bw
         self.path = self.get_path(path)
         self.algorithm = algorithm
         self.output = output
@@ -54,11 +55,19 @@ class Dither():
         find_closest_palette_color(oldpixel) = floor(oldpixel / 256)
         """
 
-        new_img = Image.open(image_file)
+        new_img = Image.open(image_file).convert('RGBA')
+
+        # Turn transparent pixels white
+        background = Image.new("RGBA", new_img.size, "WHITE")
+        background.paste(new_img, mask=new_img)
+
+        # Convert to black and white if instructed
+        if self.bw:
+            new_img = new_img.convert('L')
 
         new_img = new_img.convert('RGB')
-        pixel = new_img.load()
 
+        pixel = new_img.load()
         x_lim, y_lim = new_img.size
 
         for y in range(1, y_lim):
@@ -104,6 +113,9 @@ class Dither():
                     pixel[x+1, y+1] = (red, green, blue)
 
         if self.output:
+            # Set colour to 1-bit if black and white is true
+            if self.bw:
+                new_img = new_img.convert("1")
             new_img.save(self.output)
         else:
             new_img.show()
@@ -113,9 +125,9 @@ def main():
     parser = ArgumentParser(description="Image dithering in python")
     parser.add_argument("image_path", help="input image location")
     parser.add_argument("-o", help="output image location")
+    parser.add_argument("--bw", help="black and white", action="store_true")
     args = parser.parse_args()
 
-    if args.image_path and not args.o:
-        Dither(args.image_path)
-    elif args.image_path and args.o:
-        Dither(args.image_path, output=args.o)
+    Dither(args.image_path, output=args.o, bw=args.bw)
+
+main()
